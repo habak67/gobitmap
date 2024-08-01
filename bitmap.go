@@ -86,3 +86,15 @@ func checkIdx(idx, high int) {
 // EmptyBitMap is an empty bitmap where all bits are cleared (false). It is usually used as the starting BitMap from
 // where you set the bits needed.
 const EmptyBitMap = BitMap(0)
+
+func And(left, right BitMap) BitMap {
+	return left & right
+}
+
+func Or(left, right BitMap) BitMap {
+	return left | right
+}
+
+func Xor(left, right BitMap) BitMap {
+	return left ^ right
+}

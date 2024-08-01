@@ -185,6 +185,162 @@ func Test_Has_OutOfRange_high(t *testing.T) {
 	t.Errorf("expected test to panic")
 }
 
+func TestAnd(t *testing.T) {
+	tests := []struct {
+		name   string
+		left   BitMap
+		right  BitMap
+		result BitMap
+	}{
+		{
+			name:   "disjoint",
+			left:   EmptyBitMap.Set(1).Set(3).Set(23),
+			right:  EmptyBitMap.Set(2).Set(4).Set(24),
+			result: EmptyBitMap,
+		},
+		{
+			name:   "overlapping",
+			left:   EmptyBitMap.Set(1).Set(3).Set(23),
+			right:  EmptyBitMap.Set(2).Set(3).Set(23),
+			result: EmptyBitMap.Set(3).Set(23),
+		},
+		{
+			name:   "same",
+			left:   EmptyBitMap.Set(1).Set(3).Set(23),
+			right:  EmptyBitMap.Set(1).Set(3).Set(23),
+			result: EmptyBitMap.Set(1).Set(3).Set(23),
+		},
+		{
+			name:   "left empty",
+			left:   EmptyBitMap.Set(1).Set(3).Set(23),
+			right:  EmptyBitMap,
+			result: EmptyBitMap,
+		},
+		{
+			name:   "right empty",
+			left:   EmptyBitMap,
+			right:  EmptyBitMap.Set(1).Set(3).Set(23),
+			result: EmptyBitMap,
+		},
+		{
+			name:   "both empty",
+			left:   EmptyBitMap,
+			right:  EmptyBitMap,
+			result: EmptyBitMap,
+		},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			result := And(test.left, test.right)
+			compareMaps(t, test.result, result)
+		})
+	}
+}
+
+func TestOr(t *testing.T) {
+	tests := []struct {
+		name   string
+		left   BitMap
+		right  BitMap
+		result BitMap
+	}{
+		{
+			name:   "disjoint",
+			left:   EmptyBitMap.Set(1).Set(3).Set(23),
+			right:  EmptyBitMap.Set(2).Set(4).Set(24),
+			result: EmptyBitMap.Set(1).Set(2).Set(3).Set(4).Set(23).Set(24),
+		},
+		{
+			name:   "overlapping",
+			left:   EmptyBitMap.Set(1).Set(3).Set(23),
+			right:  EmptyBitMap.Set(2).Set(3).Set(23),
+			result: EmptyBitMap.Set(1).Set(2).Set(3).Set(23),
+		},
+		{
+			name:   "same",
+			left:   EmptyBitMap.Set(1).Set(3).Set(23),
+			right:  EmptyBitMap.Set(1).Set(3).Set(23),
+			result: EmptyBitMap.Set(1).Set(3).Set(23),
+		},
+		{
+			name:   "left empty",
+			left:   EmptyBitMap.Set(1).Set(3).Set(23),
+			right:  EmptyBitMap,
+			result: EmptyBitMap.Set(1).Set(3).Set(23),
+		},
+		{
+			name:   "right empty",
+			left:   EmptyBitMap,
+			right:  EmptyBitMap.Set(1).Set(3).Set(23),
+			result: EmptyBitMap.Set(1).Set(3).Set(23),
+		},
+		{
+			name:   "both empty",
+			left:   EmptyBitMap,
+			right:  EmptyBitMap,
+			result: EmptyBitMap,
+		},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			result := Or(test.left, test.right)
+			compareMaps(t, test.result, result)
+		})
+	}
+}
+
+func TestXor(t *testing.T) {
+	tests := []struct {
+		name   string
+		left   BitMap
+		right  BitMap
+		result BitMap
+	}{
+		{
+			name:   "disjoint",
+			left:   EmptyBitMap.Set(1).Set(3).Set(23),
+			right:  EmptyBitMap.Set(2).Set(4).Set(24),
+			result: EmptyBitMap.Set(1).Set(2).Set(3).Set(4).Set(23).Set(24),
+		},
+		{
+			name:   "overlapping",
+			left:   EmptyBitMap.Set(1).Set(3).Set(23),
+			right:  EmptyBitMap.Set(2).Set(3).Set(23),
+			result: EmptyBitMap.Set(1).Set(2),
+		},
+		{
+			name:   "same",
+			left:   EmptyBitMap.Set(1).Set(3).Set(23),
+			right:  EmptyBitMap.Set(1).Set(3).Set(23),
+			result: EmptyBitMap,
+		},
+		{
+			name:   "left empty",
+			left:   EmptyBitMap.Set(1).Set(3).Set(23),
+			right:  EmptyBitMap,
+			result: EmptyBitMap.Set(1).Set(3).Set(23),
+		},
+		{
+			name:   "right empty",
+			left:   EmptyBitMap,
+			right:  EmptyBitMap.Set(1).Set(3).Set(23),
+			result: EmptyBitMap.Set(1).Set(3).Set(23),
+		},
+		{
+			name:   "both empty",
+			left:   EmptyBitMap,
+			right:  EmptyBitMap,
+			result: EmptyBitMap,
+		},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			result := Xor(test.left, test.right)
+			compareMaps(t, test.result, result)
+		})
+	}
+}
+
 func checkMap(t *testing.T, m uint64, size int, cb []int) {
 	checkBits := make(map[int]bool, size)
 	for i := 0; i < size; i++ {
@@ -196,6 +352,14 @@ func checkMap(t *testing.T, m uint64, size int, cb []int) {
 	for i := 0; i < 64; i++ {
 		if m&(1<<i) != 0 != checkBits[i] {
 			t.Errorf("bit %v differs (has=%v, expected=%v)", i, m&(1<<i), checkBits[i])
+		}
+	}
+}
+
+func compareMaps(t *testing.T, exp, act BitMap) {
+	for i := 0; i < 64; i++ {
+		if exp.Has(i) != act.Has(i) {
+			t.Errorf("bit %d differs\nexp=%t\ngot=%t", i, exp.Has(i), act.Has(i))
 		}
 	}
 }
