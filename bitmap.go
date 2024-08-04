@@ -65,11 +65,14 @@ func (f BitMap) StringFunc(start, end, separator string, fn func(idx int) string
 	first := true
 	for i := 0; i <= highBit; i++ {
 		if f.Has(i) {
-			if !first {
-				sb.WriteString(separator)
+			fs := fn(i)
+			if len(fs) > 0 {
+				if !first {
+					sb.WriteString(separator)
+				}
+				sb.WriteString(fs)
+				first = false
 			}
-			sb.WriteString(fn(i))
-			first = false
 		}
 	}
 	sb.WriteString(end)

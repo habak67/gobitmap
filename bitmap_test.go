@@ -129,6 +129,52 @@ func Test_String(t *testing.T) {
 	}
 }
 
+var flagNames = map[int]string{
+	1: "one",
+	2: "",
+	3: "three",
+	4: "",
+	5: "five",
+	6: "",
+}
+
+func Test_StringFunc(t *testing.T) {
+	tests := []struct {
+		name   string
+		setBit []int
+		s      string
+	}{
+		{
+			"empty", []int{},
+			"",
+		},
+		{
+			"all names", []int{1, 3, 5},
+			"one,three,five",
+		},
+		{
+			"some names some blank", []int{2, 1, 4, 3, 5, 6},
+			"one,three,five",
+		},
+		{
+			"all blank", []int{2, 4, 6},
+			"",
+		},
+	}
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			m := EmptyBitMap
+			for _, bit := range test.setBit {
+				m = m.Set(bit)
+			}
+			s := m.StringFunc("", "", ",", func(i int) string { return flagNames[i] })
+			if s != test.s {
+				t.Errorf("unexpected string\nexp=%v\ngot=%v", test.s, s)
+			}
+		})
+	}
+}
+
 func Test_Set_OutOfRange_low(t *testing.T) {
 	defer func() { recover() }()
 	m := EmptyBitMap
