@@ -9,10 +9,10 @@ import (
 // highBit is the highest bit in a BitMap.
 const highBit = 63
 
-// BitMap is an efficient map, with a fixed size of 8 bytes, containing 64 individual bits indexed by a numerical
-// index. The indexes are usually represented by a numerical constant to be more self-explanatory. Each bit could be
-// set (true) or cleared (false). A BitMap is immutable. When updating a BitMap using method Set, Clear or Toggle a
-// new updated BitMap is returned.
+// BitMap is an efficient boolean map, with a fixed size of 8 bytes, containing 64 individual bits indexed by a numerical
+// index (0 - 63). The indexes are usually represented by a numerical constant to be more self-explanatory. Each bit
+// could be set (true) or cleared (false). A BitMap is immutable. When updating a BitMap using method Set, Clear or
+// Toggle a new updated BitMap is returned.
 //
 // There is no new-function for creating a BitMap. Instead, you start from EmptyBitMap which is a BitMap with all
 // bits cleared.
@@ -59,6 +59,10 @@ func (f BitMap) String() string {
 	return f.StringFunc("[", "]", ",", func(idx int) string { return strconv.Itoa(idx) })
 }
 
+// StringFunc create a string representation of the bitmap. The string representation starts with ´start´ and ends
+// with ´end´. Each entry set in the bitmap is transformed to a string using the provided transformer function ´fn´.
+// Each value in the slice is separated with ´separator´. The method is typically not used directly but is more likely
+// used indirectly using the method String() where a set entry is represented by the index of the entry.
 func (f BitMap) StringFunc(start, end, separator string, fn func(idx int) string) string {
 	var sb strings.Builder
 	sb.WriteString(start)
@@ -90,14 +94,20 @@ func checkIdx(idx, high int) {
 // where you set the bits needed.
 const EmptyBitMap = BitMap(0)
 
+// And returns the logical ´and´ of two bitmaps. That is, a bit in the result is set if the corresponding bit in
+// both ´left´ and ´right´ is set.
 func And(left, right BitMap) BitMap {
 	return left & right
 }
 
+// Or returns the logical ´or´ of two bitmaps. That is, a bit in the result is set if the corresponding bit in
+// either left´ or ´right´ is set.
 func Or(left, right BitMap) BitMap {
 	return left | right
 }
 
+// Xor returns the logical ´xor´ of two bitmaps. That is, a bit in the result is set if the corresponding bit in
+// one of ´left´ or ´right´ is set but not both.
 func Xor(left, right BitMap) BitMap {
 	return left ^ right
 }
